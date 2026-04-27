@@ -2,9 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import { useDropzone } from "react-dropzone"
 import { FiUploadCloud } from "react-icons/fi"
 import { useSelector } from "react-redux"
-
-import "video-react/dist/video-react.css"
-import { Player } from "video-react"
+import ReactPlayer from "react-player"
 
 export default function Upload({
   name,
@@ -63,9 +61,8 @@ export default function Upload({
         {label} {!viewData && <sup className="text-pink-200">*</sup>}
       </label>
       <div
-        className={`${
-          isDragActive ? "bg-richblack-600" : "bg-richblack-700"
-        } flex min-h-[250px] cursor-pointer items-center justify-center rounded-md border-2 border-dotted border-richblack-500`}
+        className={`${isDragActive ? "bg-richblack-600" : "bg-richblack-700"
+          } flex min-h-[250px] cursor-pointer items-center justify-center rounded-md border-2 border-dotted border-richblack-500`}
       >
         {previewSource ? (
           <div className="flex w-full flex-col p-6">
@@ -76,7 +73,14 @@ export default function Upload({
                 className="h-full w-full rounded-md object-cover"
               />
             ) : (
-              <Player aspectRatio="16:9" playsInline src={previewSource} />
+              <div className="aspect-video w-full overflow-hidden rounded-md">
+                <ReactPlayer
+                  url={previewSource}
+                  controls
+                  width="100%"
+                  height="100%"
+                />
+              </div>
             )}
             {!viewData && (
               <button

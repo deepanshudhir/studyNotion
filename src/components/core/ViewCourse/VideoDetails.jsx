@@ -1,10 +1,8 @@
 import React, { useEffect, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { useNavigate, useParams } from "react-router-dom"
-
-import "video-react/dist/video-react.css"
+import ReactPlayer from "react-player"
 import { useLocation } from "react-router-dom"
-import { BigPlayButton, Player } from "video-react"
 
 import { markLectureAsComplete } from "../../../services/operations/courseDetailsAPI"
 import { updateCompletedLectures } from "../../../slices/viewCourseSlice"
@@ -26,7 +24,7 @@ const VideoDetails = () => {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    ;(async () => {
+    ; (async () => {
       if (!courseSectionData.length) return
       if (!courseId && !sectionId && !subSectionId) {
         navigate(`/dashboard/enrolled-courses`)
@@ -177,23 +175,18 @@ const VideoDetails = () => {
           className="h-full w-full rounded-md object-cover"
         />
       ) : (
-        <Player
-          ref={playerRef}
-          aspectRatio="16:9"
-          playsInline
-          onEnded={() => setVideoEnded(true)}
-          src={videoData?.videoUrl}
-        >
-          <BigPlayButton position="center" />
-          {/* Render When Video Ends */}
+        <div className="relative aspect-video w-full overflow-hidden rounded-md">
+          <ReactPlayer
+            ref={playerRef}
+            url={videoData?.videoUrl}
+            controls
+            width="100%"
+            height="100%"
+            onEnded={() => setVideoEnded(true)}
+          />
+
           {videoEnded && (
-            <div
-              style={{
-                backgroundImage:
-                  "linear-gradient(to top, rgb(0, 0, 0), rgba(0,0,0,0.7), rgba(0,0,0,0.5), rgba(0,0,0,0.1)",
-              }}
-              className="full absolute inset-0 z-[100] grid h-full place-content-center font-inter"
-            >
+            <div className="absolute inset-0 z-50 grid place-content-center bg-black/70">
               {!completedLectures.includes(subSectionId) && (
                 <IconBtn
                   disabled={loading}
@@ -202,41 +195,34 @@ const VideoDetails = () => {
                   customClasses="text-xl max-w-max px-4 mx-auto"
                 />
               )}
+
               <IconBtn
                 disabled={loading}
                 onclick={() => {
                   if (playerRef?.current) {
-                    // set the current time of the video to 0
-                    playerRef?.current?.seek(0)
+                    playerRef.current.seekTo(0)
                     setVideoEnded(false)
                   }
                 }}
                 text="Rewatch"
                 customClasses="text-xl max-w-max px-4 mx-auto mt-2"
               />
+
               <div className="mt-10 flex min-w-[250px] justify-center gap-x-4 text-xl">
                 {!isFirstVideo() && (
-                  <button
-                    disabled={loading}
-                    onClick={goToPrevVideo}
-                    className="blackButton"
-                  >
+                  <button onClick={goToPrevVideo} className="blackButton">
                     Prev
                   </button>
                 )}
                 {!isLastVideo() && (
-                  <button
-                    disabled={loading}
-                    onClick={goToNextVideo}
-                    className="blackButton"
-                  >
+                  <button onClick={goToNextVideo} className="blackButton">
                     Next
                   </button>
                 )}
               </div>
             </div>
           )}
-        </Player>
+        </div>
       )}
 
       <h1 className="mt-4 text-3xl font-semibold">{videoData?.title}</h1>
