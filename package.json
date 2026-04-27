@@ -6,7 +6,9 @@
   "scripts": {
     "frontend": "vite",
     "backend": "nodemon server/index.js",
-    "dev": "concurrently \"npm run backend\" \"npm run frontend\""
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@ramonak/react-progress-bar": "^5.4.0",
