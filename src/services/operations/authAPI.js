@@ -85,35 +85,63 @@ export function signUp(
 
 export function login(email, password, navigate) {
   return async (dispatch) => {
-    const toastId = toast.loading("Loading...")
-    dispatch(setLoading(true))
+    const toastId = toast.loading("Loading...");
+
+    dispatch(setLoading(true));
+
     try {
-      const response = await apiConnector("POST", LOGIN_API, {
-        email,
-        password,
-      })
+      const response = await apiConnector(
+        "POST",
+        LOGIN_API,
+        {
+          email,
+          password,
+        }
+      );
 
-      console.log("LOGIN API RESPONSE............", response)
+      console.log("LOGIN API RESPONSE:", response);
 
-      if (!response.data.success) {
-        throw new Error(response.data.message)
+      // ✅ Correct check
+      if (!response.success) {
+        throw new Error(response.message);
       }
 
-      toast.success("Login Successful")
-      dispatch(setToken(response.data.token))
-      const userImage = response.data?.user?.image
-        ? response.data.user.image
-        : `https://api.dicebear.com/5.x/initials/svg?seed=${response.data.user.firstName} ${response.data.user.lastName}`
-      dispatch(setUser({ ...response.data.user, image: userImage }))
-      localStorage.setItem("token", JSON.stringify(response.data.token))
-      navigate("/dashboard/my-profile")
+      toast.success("Login Successful");
+
+      // Save token in Redux
+      dispatch(setToken(response.token));
+
+      // Default user image
+      const userImage = response?.user?.image
+        ? response.user.image
+        : `https://api.dicebear.com/5.x/initials/svg?seed=${response.user.firstName} ${response.user.lastName}`;
+
+      // Save user in Redux
+      dispatch(
+        setUser({
+          ...response.user,
+          image: userImage,
+        })
+      );
+
+      // Save token in localStorage
+      localStorage.setItem(
+        "token",
+        JSON.stringify(response.token)
+      );
+
+      navigate("/dashboard/my-profile");
     } catch (error) {
-      console.log("LOGIN API ERROR............", error)
-      toast.error("Login Failed")
+      console.log("LOGIN API ERROR:", error);
+
+      toast.error(
+        error.message || "Login Failed"
+      );
     }
-    dispatch(setLoading(false))
-    toast.dismiss(toastId)
-  }
+
+    dispatch(setLoading(false));
+    toast.dismiss(toastId);
+  };
 }
 
 export function getPasswordResetToken(email, setEmailSent) {

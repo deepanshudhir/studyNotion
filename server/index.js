@@ -9,6 +9,11 @@ const contactUsRoute = require("./routes/Contact");
 const database = require("./config/database");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://study-notion-nu-lovat.vercel.app",
+];
 const {cloudinaryConnect } = require("./config/cloudinary");
 const fileUpload = require("express-fileupload");
 const dotenv = require("dotenv");
@@ -22,11 +27,20 @@ database.connect();
 app.use(express.json());
 app.use(cookieParser());
 app.use(
-	cors({
-		origin:"https://study-notion-nu-lovat.vercel.app",
-		credentials:true,
-	})
-)
+  cors({
+    origin: function (origin, callback) {
+      // allow requests with no origin
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 app.use(
 	fileUpload({
 	  useTempFiles: true,
