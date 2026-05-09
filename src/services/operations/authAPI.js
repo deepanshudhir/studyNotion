@@ -101,41 +101,40 @@ export function login(email, password, navigate) {
 
       console.log("LOGIN API RESPONSE:", response);
 
-      // ✅ Correct check
-      if (!response.success) {
-        throw new Error(response.message);
+      // ✅ Correct
+      if (!response.data.success) {
+        throw new Error(response.data.message);
       }
 
       toast.success("Login Successful");
 
-      // Save token in Redux
-      dispatch(setToken(response.token));
+      dispatch(setToken(response.data.token));
 
-      // Default user image
-      const userImage = response?.user?.image
-        ? response.user.image
-        : `https://api.dicebear.com/5.x/initials/svg?seed=${response.user.firstName} ${response.user.lastName}`;
+      const userImage = response.data.user?.image
+        ? response.data.user.image
+        : `https://api.dicebear.com/5.x/initials/svg?seed=${response.data.user.firstName} ${response.data.user.lastName}`;
 
-      // Save user in Redux
       dispatch(
         setUser({
-          ...response.user,
+          ...response.data.user,
           image: userImage,
         })
       );
 
-      // Save token in localStorage
       localStorage.setItem(
         "token",
-        JSON.stringify(response.token)
+        JSON.stringify(response.data.token)
       );
 
       navigate("/dashboard/my-profile");
+
     } catch (error) {
       console.log("LOGIN API ERROR:", error);
 
       toast.error(
-        error.message || "Login Failed"
+        error.response?.data?.message ||
+        error.message ||
+        "Login Failed"
       );
     }
 
